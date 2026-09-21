@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Service Mesh 流量治理仿真控制台</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="logo-dot"></span>
+    <div>
+      <h1>Service Mesh 流量治理与熔断降级仿真内核</h1>
+      <span class="subtitle">零第三方依赖 · 纯标准库 asyncio + http.server · 原生 Canvas 拓扑</span>
+    </div>
+  </div>
+  <div class="status-pill" id="conn-pill">
+    <span class="pill-dot" id="conn-dot"></span><span id="conn-text">连接中…</span>
+  </div>
+</header>
+
+<main class="layout">
+  <!-- left: topology + global stats -->
+  <section class="panel canvas-panel">
+    <div class="panel-head">
+      <h2>集群拓扑 · 实时路由</h2>
+      <div class="legend">
+        <span><i class="sw sw-closed"></i>关闭 CLOSED</span>
+        <span><i class="sw sw-open"></i>开启 OPEN</span>
+        <span><i class="sw sw-half"></i>半开 HALF_OPEN</span>
+        <span><i class="sw sw-offline"></i>离线</span>
+      </div>
+    </div>
+    <div class="stat-strip" id="global-stats"></div>
+    <div class="canvas-wrap">
+      <canvas id="topo"></canvas>
+    </div>
+  </section>
+
+  <!-- right: controls + node table -->
+  <aside class="sidebar">
+    <section class="panel">
+      <div class="panel-head"><h2>一键演示</h2></div>
+      <div class="demo-box">
+        <button class="btn btn-primary" id="btn-demo-burst">
+          ① 正常突发 · 限流平滑分流
+        </button>
+        <button class="btn btn-danger" id="btn-demo-breaker">
+          ② 注入延迟 · 熔断切除 · 半开自愈
+        </button>
+        <div class="demo-status" id="demo-status">就绪</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>手动流量</h2></div>
+      <div class="ctrl-row">
+        <label>背景流量 <b id="rate-label">0</b> rps</label>
+        <input type="range" id="rate-slider" min="0" max="90" value="0" step="5">
+      </div>
+      <div class="btn-row">
+        <button class="btn" id="btn-burst">并发突发 ×140</button>
+        <button class="btn" id="btn-stop">停止流量</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>故障注入</h2></div>
+      <div class="ctrl-row">
+        <label>目标节点</label>
+        <select id="fault-node"></select>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-warn" id="btn-latency">注入 +650ms 延迟</button>
+        <button class="btn" id="btn-clear-latency">清除延迟</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-danger" id="btn-fault">50% 强制错误</button>
+        <button class="btn" id="btn-clear-fault">清除错误</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-danger" id="btn-offline">节点下线</button>
+        <button class="btn" id="btn-online">恢复上线</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>节点实时指标</h2></div>
+      <div class="node-table" id="node-table"></div>
+    </section>
+
+    <section class="panel">
+      <button class="btn btn-block" id="btn-reset">重置内核（清故障 / 清计数器）</button>
+    </section>
+  </aside>
+</main>
+
+<section class="panel log-panel">
+  <div class="panel-head">
+    <h2>时序治理日志</h2>
+    <div class="log-tools">
+      <label class="autoscroll"><input type="checkbox" id="autoscroll" checked> 自动滚动</label>
+      <button class="btn btn-mini" id="btn-clear-log">清空</button>
+    </div>
+  </div>
+  <div class="log-console" id="log"></div>
+</section>
+
+<script src="/app.js"></script>
+</body>
+</html>
