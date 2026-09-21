@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>异步服务网格 · 流量治理与熔断降级仿真控制台</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="logo-dot"></span>
+    <div>
+      <h1>Service Mesh 流量治理仿真内核</h1>
+      <p>平滑加权负载均衡 · 断路器三态状态机 · 令牌桶限流 · 熔断自愈</p>
+    </div>
+  </div>
+  <div class="global-stats" id="globalStats">
+    <div class="stat"><span class="stat-label">吞吐 RPS</span><span class="stat-value" id="statRps">--</span></div>
+    <div class="stat"><span class="stat-label">成功</span><span class="stat-value ok" id="statOk">--</span></div>
+    <div class="stat"><span class="stat-label">超时</span><span class="stat-value warn" id="statStatTimeout">--</span></div>
+    <div class="stat"><span class="stat-label">限流丢弃</span><span class="stat-value drop" id="statThrottle">--</span></div>
+    <div class="stat"><span class="stat-label">熔断拦截</span><span class="stat-value drop" id="statReject">--</span></div>
+    <div class="stat"><span class="stat-label">在途并发</span><span class="stat-value" id="statConcurrency">--</span></div>
+  </div>
+</header>
+
+<section class="controls">
+  <div class="control-group">
+    <button class="btn primary" id="btnDemoFull">▶ 一键全流程演示</button>
+    <button class="btn" id="btnDemoNormal">突发限流分流</button>
+    <button class="btn" id="btnDemoCircuit">熔断·切除·半开自愈</button>
+  </div>
+  <div class="control-divider"></div>
+  <div class="control-group">
+    <label class="slider-box">常态流量
+      <input type="range" id="rpsSlider" min="0" max="200" value="70" step="5">
+      <span id="rpsValue">70</span> RPS
+    </label>
+    <button class="btn warn" id="btnBurst">⚡ 突发洪峰</button>
+  </div>
+  <div class="control-divider"></div>
+  <div class="control-group">
+    <select id="nodeSelect" title="选择故障节点"></select>
+    <button class="btn danger" id="btnInjectDelay">注入 350ms 延迟</button>
+    <button class="btn danger" id="btnInjectError">注入异常</button>
+    <button class="btn ok" id="btnRecover">故障恢复</button>
+    <button class="btn ghost" id="btnReset">复位断路器</button>
+  </div>
+  <div class="demo-banner" id="demoBanner"></div>
+</section>
+
+<main class="layout">
+  <section class="panel topology-panel">
+    <div class="panel-head">
+      <h2>集群拓扑 · 实时路由</h2>
+      <div class="legend">
+        <span><i class="dot closed"></i>CLOSED 正常</span>
+        <span><i class="dot half"></i>HALF_OPEN 半开试探</span>
+        <span><i class="dot open"></i>OPEN 熔断</span>
+        <span><i class="dot gateway"></i>网关/限流</span>
+      </div>
+    </div>
+    <canvas id="topology"></canvas>
+  </section>
+
+  <section class="panel nodes-panel">
+    <div class="panel-head"><h2>节点治理面板</h2></div>
+    <div id="nodeCards" class="node-cards"></div>
+  </section>
+</main>
+
+<section class="panel log-panel">
+  <div class="panel-head">
+    <h2>时序治理日志</h2>
+    <div class="log-tools">
+      <label class="mini-check"><input type="checkbox" id="followLog" checked> 自动滚动</label>
+      <button class="btn tiny ghost" id="btnClearLog">清空</button>
+    </div>
+  </div>
+  <div id="logConsole" class="log-console"></div>
+</section>
+
+<footer class="footer">
+  纯 Python 标准库 + 原生 HTML/CSS/Canvas/JavaScript 实现 · 零第三方依赖 ·
+  <span id="connState">连接中…</span>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>
